@@ -1,39 +1,41 @@
 //
-// Created by RigelShrimp on 2025/1/18.
+// Created by RigelShrimp on 2025/3/3.
 //
-#include "fft.h"
+
+#include "ifft.h"
 #include <stdexcept>
 
 namespace fft_library {
-Eigen::VectorXcd fft(const Eigen::VectorXd& X, int n) {
-    if (X.size() == 0 || n <= 0) {
+Eigen::VectorXcd ifft(const Eigen::VectorXcd& X, int n) {
+    if (X.size() == 0 || n == 0) {
         return Eigen::VectorXcd(0);
     }
 
-    Eigen::VectorXcd x_complex = Eigen::VectorXcd::Zero(n);
+    thread_local Eigen::FFT<double> fft_processor;
 
+    if (n == -1) {
+        Eigen::VectorXcd result(X.rows());
+        fft_processor.inv(result, X);
+        return result;
+    }
+    Eigen::VectorXcd result(n);
+    Eigen::VectorXcd x_padded = Eigen::VectorXcd::Zero(n);
 
     for (int i = 0; i < std::min(static_cast<int>(X.size()), n); ++i) {
-        x_complex(i) = std::complex<double>(X(i), 0.0);
+        x_padded(i) = X(i);
     }
 
-    thread_local Eigen::FFT<double> fft_processor;
-    Eigen::VectorXcd result(n);
-    fft_processor.fwd(result, x_complex);
-
-
+    fft_processor.inv(result, x_padded);
 
     return result;
 }
-
-
-Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X, int n, int dim) {
+Eigen::MatrixXcd ifft(const Eigen::MatrixXcd& X, int n, int dim) {
     if (X.size() == 0 || n == 0) {
         return Eigen::MatrixXcd{0, 0};
     }
 
     if (n < 0) {
-        throw std::invalid_argument("FFT size n cannot be negative");
+        throw std::invalid_argument("IFFT size n cannot be negative");
     }
 
     if (dim != 1 && dim != 2) {
@@ -52,10 +54,11 @@ Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X, int n, int dim) {
 
         for (Eigen::Index i = 0; i < result.cols(); ++i) {
             Eigen::VectorXcd col {result.col(i)};
-            fft_processor.fwd(col, col);
+            fft_processor.inv(col, col);
             result.col(i) = col;
         }
     } else {
+
         result.conservativeResize(Eigen::NoChange, n);
         if (n > X.cols()) {
             result.rightCols(n - X.cols()).setZero();
@@ -63,7 +66,7 @@ Eigen::MatrixXcd fft(const Eigen::MatrixXcd& X, int n, int dim) {
 
         for (Eigen::Index i = 0; i < result.rows(); ++i) {
             Eigen::VectorXcd row {result.row(i)};
-            fft_processor.fwd(row, row);
+            fft_processor.inv(row, row);
             result.row(i) = row;
         }
     }
