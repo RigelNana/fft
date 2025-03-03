@@ -1,7 +1,9 @@
+#include "conv.h"
 #include "fft.h"
+#include "ifft.h"
+#include <chrono>
 #include <iomanip>
 #include <iostream>
-#include <chrono>
 
 int main() {
     Eigen::MatrixXcd X(5, 4);
@@ -14,9 +16,32 @@ int main() {
 
     auto time_start = std::chrono::high_resolution_clock::now();
     Eigen::MatrixXcd Y = fft_library::fft(X, 5, 1);
+    std::cout << Y;
     auto time_end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time_end - time_start);
     std::cout << "Time: " << time_span.count() << " seconds." << std::endl;
-    // std::cout <<std::setprecision(10)
+
+    time_start = std::chrono::high_resolution_clock::now();
+    Eigen::MatrixXcd Z = fft_library::ifft(Y, 5, 1);
+    time_end = std::chrono::high_resolution_clock::now();
+    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time_end - time_start);
+
+    std::cout << Z;
+    std::cout << "Time: " << time_span.count() << " seconds." << std::endl;
+    // // std::cout <<std::setprecision(10)
+    //
+    Eigen::VectorXd u(7);
+    u << -1, 2, 3, -2, 0, 1, 2;
+    //std::cout << fft_library::fft(u, 9);
+    //
+    Eigen::VectorXd v(4);
+    v << 2, 4, -1, 1;
+    time_start = std::chrono::high_resolution_clock::now();
+    Eigen::VectorXd conv1 = fft_library::conv(u,v);
+    time_end = std::chrono::high_resolution_clock::now();
+    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time_end - time_start);
+    std::cout << conv1 << '\n';
+    std::cout << "Time: " << time_span.count() << " seconds." << std::endl;
+
     return 0;
 }
