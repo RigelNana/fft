@@ -9,7 +9,7 @@
 #include <complex>
 
 namespace fft_library {
-    Eigen::VectorXcd fft(const Eigen::VectorXd& X, int n);
+    Eigen::VectorXcd fft(const Eigen::VectorXd& X, int n = -1);
     Eigen::MatrixXcd fft(const Eigen::MatrixXcd &X, int n = -1, int dim = 1);
 
 }

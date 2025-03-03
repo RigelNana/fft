@@ -15,14 +15,14 @@ int main() {
          std::complex<double>(-0.4316, -0.0704), std::complex<double>(0.8781, -1.5313), std::complex<double>(-0.4233, 0.6018), std::complex<double>(0.2675, -1.1114);
 
     auto time_start = std::chrono::high_resolution_clock::now();
-    Eigen::MatrixXcd Y = fft_library::fft(X, 5, 1);
-    std::cout << Y;
+    Eigen::MatrixXcd Y = fft_library::fft(X, 7, 1);
+    std::cout << Y << "\n\n";
     auto time_end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time_end - time_start);
     std::cout << "Time: " << time_span.count() << " seconds." << std::endl;
 
     time_start = std::chrono::high_resolution_clock::now();
-    Eigen::MatrixXcd Z = fft_library::ifft(Y, 5, 1);
+    Eigen::MatrixXcd Z = fft_library::ifft(X, 8, 1);
     time_end = std::chrono::high_resolution_clock::now();
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time_end - time_start);
 
@@ -32,7 +32,7 @@ int main() {
     //
     Eigen::VectorXd u(7);
     u << -1, 2, 3, -2, 0, 1, 2;
-    //std::cout << fft_library::fft(u, 9);
+    std::cout << fft_library::ifft(static_cast<Eigen::VectorXcd>(u), 10) << "\n\n";
     //
     Eigen::VectorXd v(4);
     v << 2, 4, -1, 1;
@@ -40,7 +40,8 @@ int main() {
     Eigen::VectorXd conv1 = fft_library::conv(u,v);
     time_end = std::chrono::high_resolution_clock::now();
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time_end - time_start);
-    std::cout << conv1 << '\n';
+    std::cout << conv1 << "\n\n";
+    std::cout << fft_library::fft(u,10) << "\n\n";
     std::cout << "Time: " << time_span.count() << " seconds." << std::endl;
 
     return 0;
